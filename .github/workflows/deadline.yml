@@ -27,7 +27,7 @@ jobs:
               req = urllib.request.Request('https://api.github.com/repos/'+os.environ['GH_REPO']+path, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','User-Agent':'UnlockHerTech-Challenge'}, data=None if data is None else json.dumps(data).encode())
               with urllib.request.urlopen(req, timeout=30) as response:
                   return json.load(response)
-          with urllib.request.urlopen(origin+'/api/state', timeout=30) as response:
+          with urllib.request.urlopen(urllib.request.Request(origin+'/api/state', headers={'User-Agent':'UnlockHerTech-Challenge'}), timeout=30) as response:
               state = json.load(response)
           if 'start' not in state or 'deadline' not in state:
               raise RuntimeError('Invalid timer response; manual timing review required')
