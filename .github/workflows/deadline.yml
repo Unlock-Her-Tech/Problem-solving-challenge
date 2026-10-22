@@ -22,7 +22,7 @@ jobs:
         run: |
           import os, json, urllib.request, urllib.error, datetime
           from pathlib import Path
-          origin = 'https://unlockhertech-problemsolving.orangeemu18.chatgpt.site'
+          origin = 'https://unlockhertech-problemsolving.netlify.app'
           def api(path, data=None):
               req = urllib.request.Request('https://api.github.com/repos/'+os.environ['GH_REPO']+path, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','User-Agent':'UnlockHerTech-Challenge'}, data=None if data is None else json.dumps(data).encode())
               with urllib.request.urlopen(req, timeout=30) as response:
