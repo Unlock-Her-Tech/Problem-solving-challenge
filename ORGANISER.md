@@ -13,6 +13,10 @@ The event date has deliberately not been guessed. Questions stay locked indefini
 
 ## Hosting
 
+The public participant and organiser pages are hosted at https://unlockhertech-problemsolving.netlify.app on Netlify. Netlify proxies `/api/*` requests to the existing durable challenge service. Keep that backend running: it stores the official start time and keeps the questions private. Changing the public host does not reset the event. The existing organiser password still applies.
+
+The Netlify deployment bundle is maintained separately from participant submissions. Only the static frontend and proxy configuration are uploaded; private questions and passwords are never included. The default GitHub deadline workflow queries the Netlify address.
+
 The hosted version runs `worker/index.js` with `worker/assets.js` on Cloudflare Workers through Sites. Bind a private R2 bucket as `BUCKET`. Store runtime secrets separately:
 
 | Variable | Purpose |
