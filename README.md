@@ -2,7 +2,7 @@
 
 A **40-minute data structures challenge** for junior-to-mid engineers. Work individually or in a **team of two maximum**, using any programming language. Individual and team entries are ranked separately.
 
-**Challenge page:** https://unlock-her-tech-challenge.orangeemu18.chatgpt.site
+**Challenge page:** https://unlockhertech-problemsolving.orangeemu18.chatgpt.site
 
 The organiser presses Start on the event day. Until then, the three problem statements stay on the server and are inaccessible through this repository or the participant page. There is no automatic calendar release. Do not wait for a file to appear in your fork: read the problems on the challenge page.
 
