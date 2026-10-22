@@ -1,0 +1,52 @@
+name: Submission deadline
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+permissions:
+  actions: read
+  issues: write
+  pull-requests: write
+jobs:
+  deadline:
+    runs-on: ubuntu-latest
+    steps:
+      # No checkout: participant code is never executed with the write token.
+      - name: Record submission timing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        shell: python
+        run: |
+          import os, json, urllib.request, urllib.error, datetime
+          from pathlib import Path
+          origin = 'https://unlock-her-tech-challenge.orangeemu18.chatgpt.site'
+          def api(path, data=None):
+              req = urllib.request.Request('https://api.github.com/repos/'+os.environ['GH_REPO']+path, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','Content-Type':'application/json','User-Agent':'UnlockHerTech-Challenge'}, data=None if data is None else json.dumps(data).encode())
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  return json.load(response)
+          with urllib.request.urlopen(origin+'/api/state', timeout=30) as response:
+              state = json.load(response)
+          if 'start' not in state or 'deadline' not in state:
+              raise RuntimeError('Invalid timer response; manual timing review required')
+          event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+          run = api('/actions/runs/'+os.environ['RUN_ID'])
+          received = datetime.datetime.fromisoformat(run['created_at'].replace('Z','+00:00'))
+          ms = received.timestamp()*1000
+          status = 'before-start' if state['start'] is None or ms < state['start'] else 'late' if ms >= state['deadline'] else 'on-time'
+          if 'pull_request' not in event:
+              Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('Timer connectivity OK. Event state: '+state['phase']+'. No event started or changed.')
+              raise SystemExit(0)
+          pr=event['pull_request']; sha=pr['head']['sha']; number=pr['number']
+          colors={'on-time':'238636','late':'d73a4a','before-start':'d4c5f9'}
+          try:
+              api('/labels',{'name':status,'color':colors[status]})
+          except urllib.error.HTTPError as error:
+              if error.code != 422: raise
+          api('/issues/'+str(number)+'/labels',{'labels':[status]})
+          deadline = 'not started' if state['deadline'] is None else datetime.datetime.fromtimestamp(state['deadline']/1000,datetime.timezone.utc).isoformat()
+          text = '**Submission timing: '+status+'**\n\nCommit: `'+sha+'`\n\nGitHub workflow received: '+run['created_at']+'\n\nEvent deadline (UTC): '+deadline+'\n\nAudit: '+run['html_url']+' (attempt '+os.environ['RUN_ATTEMPT']+'). Timing uses GitHub workflow creation time; delayed delivery or service failures require organiser review. Labels are cumulative. Grade the latest on-time SHA, not a later PR head.'
+          api('/issues/'+str(number)+'/comments',{'body':text})
+          Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(text)
