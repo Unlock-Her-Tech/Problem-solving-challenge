@@ -91,7 +91,3 @@ Each problem uses 70% correctness, 20% efficiency, and 10% explanation. Organise
 | Sliding window | 31.5 | 9 | 4.5 | 45 |
 
 A correct but slower implementation can earn correctness credit. For the recursion problem, recursive processing is part of the efficiency/approach criteria. Clear runnable code, meaningful tests, and an honest explanation make review easier. Equal totals share a rank; submission speed is not a tiebreaker within the allowed time.
-
-## Organisers
-
-See [ORGANISER.md](ORGANISER.md) for hosting, private questions, Start controls, submission tracking, and the event-day checklist. The repository intentionally contains no actual questions, private tests, answers, or organiser password.
