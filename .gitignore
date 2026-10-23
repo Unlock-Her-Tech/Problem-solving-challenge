@@ -1,6 +1,7 @@
-node_modules/
-data/
-.env
-private/
-*.sqlite*
 .DS_Store
+.env
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+*.class
