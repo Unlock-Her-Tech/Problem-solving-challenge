@@ -22,4 +22,4 @@ Describe normal cases and edge cases you tested.
 - [ ] This is our own work, completed without AI assistance or AI autocomplete.
 - [ ] We have not copied another participant's solution.
 - [ ] There are no more than two people in this submission.
-- [ ] We understand that updates received after the deadline are flagged late.
+- [ ] We understand that updates received after the deadline are flagged late (unless pre-verified via the fallback submission channel).
