@@ -1,98 +1,53 @@
 # Unlock Her Tech · Problem Solving Challenge
 
-**40 minutes · Any programming language · Individual or team of two**
+**90 minutes · Any programming language · Solo followed by random teams of three**
 
-Challenge page: **https://unlockhertech-problemsolving.netlify.app**
+[Live challenge and shared timer](https://unlockhertech-problemsolving.netlify.app)
 
-Fork this repository, add your solutions, and open one pull request with your name or team name. You do not need to install or run a website or timer from this repository.
+| Elapsed time | Activity |
+| --- | --- |
+| 00:00–00:15 | Welcome, facilitator introductions and setup check |
+| 00:15–00:45 | Phase 1 · Individual challenge |
+| 00:45–00:50 | Individual PR submission window |
+| 00:50–01:20 | Phase 2 · Team challenge in random breakout rooms of three |
+| 01:20–01:25 | Team PR submission window |
+| 01:25–01:30 | Wrap-up, Q&A and award timeline announcement |
 
 ## Before the challenge
 
-1. Sign in to GitHub and click **Fork** to create your own copy.
-2. Clone your fork and create a submission branch:
+1. Fork and clone this repository. If you already have a fork, sync its `main` before creating your submission branches.
+2. Check that your editor and language tools work. Disable AI chat, agents and AI autocomplete before the welcome check. Official language documentation and non-AI editor autocomplete are allowed.
+3. Open the live page. Each problem unlocks at the beginning of its coding phase. Follow the organiser's pause, resume and stop instructions.
 
-   ```sh
-   git clone https://github.com/YOUR-USERNAME/Problem-solving-challenge.git
-   cd Problem-solving-challenge
-   git switch -c submission
-   ```
+## Solve and submit
 
-3. Prepare your editor and preferred language tools. Disable AI chat, agents, and AI autocomplete.
-4. If entering as a team, work in one fork, share one PR, and name both members. Maximum team size is **two**.
-5. Open the challenge page and wait for the organiser. Questions appear there when the shared session starts; they are not included in the repository.
+| Track | Base for your branch | Folder | Pull request |
+| --- | --- | --- | --- |
+| Problem 1 (Solo) | Up-to-date fork `main` | [solutions/individual/](solutions/individual/) | One per person, titled `Individual: Your Name` |
+| Problem 2 (Team) | Up-to-date fork `main` | [solutions/team/](solutions/team/) | One per team, titled `Team: Your Team Name` |
 
-## Add your solutions
+Start your solo branch with `git switch -c individual-submission main`. Work independently. For the team phase, nominate a submitter and start a clean branch in that person's fork with `git switch -c team-submission main`. Collaborate only with your assigned team during this phase.
 
-| Folder | Topic | Marks |
-| --- | --- | ---: |
-| `solutions/challenge-1/` | Hash map | 25 |
-| `solutions/challenge-2/` | Nested recursion | 30 |
-| `solutions/challenge-3/` | Sliding window | 45 |
+Put code and tests in the matching folder. Fill out the README with your language and version, exact run and test commands, time and space complexity, edge cases, and any incomplete work. Teams also record all three members and their contributions.
 
-Use any language. Put your code and any tests inside the matching folder. Replace that folder's README with:
+Stop coding when the coding timer expires. Commit the frozen solution and push its branch to your fork. During your five-minute PR window, open one PR targeting `Unlock-Her-Tech/Problem-solving-challenge:main`, select the correct submission branch, and fill in the template. Keep each PR limited to its own folder. Do not merge it yourself or change your code during the upload window.
 
-- Your language and version.
-- Exact commands to run your solution and tests, including required dependencies.
-- A short explanation of your approach and its time/space complexity.
-- Edge cases tested and anything incomplete.
+The GitHub check records the submitted commit, track and timing. Judges use the latest eligible commit from the correct window and session. GitHub delays, outages and pauses may require organiser review. PRs and forks are public. Avoid viewing other submissions during the event, and keep credentials and personal files out of your changes.
 
-Attempt the problems in any order. Partial solutions earn partial credit. Keep changes inside `solutions/`; the instructions and GitHub checks are maintained by the organisers.
+## Fallback submission
 
-## Submit your pull request
+If a GitHub or network issue blocks submission, immediately archive only the affected solution folder or create a branch backup with `git bundle create submission-backup.bundle HEAD`. Email the attachment to community@unlockhertech.com within two minutes of the relevant PR window closing. Use subject `[Fallback Submission] Individual / Team – Name` and include your GitHub username, fork URL, commit SHA and completion time. The organiser reviews the received time and available evidence.
 
-Push your work early and update the same branch as you progress:
+## Scoring
 
-```sh
-git add solutions/
-git commit -m "Add challenge solutions"
-git push -u origin submission
-```
+Solo and team rankings are separate. Team performance never changes an individual score. Each track is out of 100, partial credit is available, and tied totals share a rank.
 
-On your fork, click **Contribute → Open pull request** or **Compare & pull request**. Check:
+| Criterion | Solo | Team |
+| --- | ---: | ---: |
+| Correctness across five equally weighted case groups | 70 | 60 |
+| Time complexity | 15 | 15 |
+| Space complexity | 5 | 5 |
+| Reproducibility and explanation | 10 | 5 |
+| Collaboration evidence | — | 15 |
 
-- **Base repository:** `Unlock-Her-Tech/Problem-solving-challenge`
-- **Base branch:** `main`
-- **Compare:** your fork's `submission` branch
-- **PR title:** `Individual: Your Name` or `Team: Your Team Name`
-
-Complete the PR template, including both members for a team. Open **one PR per individual/team**. Later pushes to your submission branch automatically update it. Only pushing to your fork is not a submission: you must open a PR against the base repository. Do not merge it yourself.
-
-## Fallback submission channel
-
-To ensure that sudden network interruptions, GitHub service degradation, or authentication issues do not result in lost work or unfair disadvantage near the deadline, an official fallback submission channel is available.
-
-If you encounter insurmountable technical blockers pushing to GitHub or opening your PR before time expires:
-
-1. **Generate a local backup bundle or archive immediately:**
-   ```sh
-   # Preferred: Create a git bundle containing your submission branch
-   git bundle create submission-backup.bundle HEAD
-
-   # Alternative: Create a zip archive of your solutions directory
-   # Ensure your solutions/ folder and any modified files are included
-   ```
-
-2. **Dispatch to the emergency submission channel:**
-   - Send an email to `community@unlockhertech.com`.
-   - **Subject line:** `[Fallback Submission] Your Name / Team Name`
-   - **Attach:** `submission-backup.bundle` or `solutions.zip`
-   - **Include in body:** Your GitHub username, repository fork URL, and the commit SHA / local completion timestamp.
-
-3. **Verification and grace window:**
-   - Fallback submissions must be sent within **2 minutes** of the event timer expiration.
-   - Organizers will audit the embedded commit timestamps and bundle history to verify on-time completion, ensuring complete fairness and evaluation parity across all participants.
-
-## Time and rules
-
-- You have **40 minutes of active challenge time**, controlled by the organiser. Follow any pause, resume or stop instructions shown on the challenge page.
-- Refreshing or joining late does not extend the shared timer. Stop coding and pushing when time expires or the organiser stops the session. Do not work during a pause.
-- PR openings and updates are checked against the session timeline. They receive `on-time`, `late`, `paused` or `before-start` flags with an audit comment recording the submitted commit. Opening a PR early does not exempt later pushes.
-- Submit well before zero: upload and GitHub event delays can affect last-second submissions. The organiser reviews disputed flags. Flags are cumulative; the intended session and latest on-time commit determine the version graded.
-- **No AI assistance:** no AI chat tools, AI autocomplete, agents, or generated solutions.
-- Normal non-AI editor autocomplete and official language documentation are allowed. Do not copy existing solutions or another participant's code, or seek outside help.
-- Public forks and PRs expose code. Do not view or copy other submissions during the event.
-- Be ready to explain your own work. Do not commit credentials or personal files.
-
-## Marking
-
-Each problem uses **70% correctness, 20% efficiency, and 10% explanation**. Maximum total: **100 marks**. Individuals and teams have separate rankings; equal totals share a rank.
+Judges apply the same cases within each track across languages. Full time-complexity credit is available for a correct linear approach, with partial credit for a correct or demonstrably applicable near-linear approach. Collaboration points cover a clear contribution record, an independently checked test or review finding, and evidence that the team integrated or validated the result. Be ready to explain your own work. AI-generated code, AI assistance and copied solutions are prohibited in both phases.

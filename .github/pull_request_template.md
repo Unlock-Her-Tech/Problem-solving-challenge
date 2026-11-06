@@ -1,25 +1,23 @@
-## Participant / team name
+## Track and name
 
-## Category
-Individual / Team (maximum 2)
+Individual / Team
 
 ## Members
-- Name — GitHub username
-- Name — GitHub username (teams only)
 
-## Language and version
+- Name and GitHub username
+- Team member 2 and GitHub username (team only)
+- Team member 3 and GitHub username (team only)
 
-## Run instructions
-Exact commands for each attempted challenge:
+## Language and run commands
 
 ## Approach and complexity
-Explain your approach, time complexity, and space complexity for each attempted problem.
 
-## Tests
-Describe normal cases and edge cases you tested.
+## Tests and limitations
+
+## Team contributions and review finding (team only)
 
 ## Declaration
-- [ ] This is our own work, completed without AI assistance or AI autocomplete.
-- [ ] We have not copied another participant's solution.
-- [ ] There are no more than two people in this submission.
-- [ ] We understand that updates received after the deadline are flagged late (unless pre-verified via the fallback submission channel).
+
+- [ ] This submission was completed without AI assistance or copied solutions.
+- [ ] It changes only the matching solution folder.
+- [ ] The code was frozen at the end of our coding phase and the PR was submitted during its assigned window.

@@ -1,4 +1,4 @@
-# Challenge 3: Sliding Window (45 marks)
+# Problem 2 (Team) · 100 marks
 
 > Place your code and test files in this directory. Fill out the details below to document your submission. The problem statement appears on the live challenge page.
 
@@ -27,3 +27,9 @@
 
 ### Incomplete Work / Known Limitations (if any)
 - 
+
+### Team contributions
+- Algorithm and invariant:
+- Edge-case tests:
+- Integration or review:
+- One finding that changed or validated the solution:

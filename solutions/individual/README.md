@@ -1,4 +1,4 @@
-# Challenge 2: Nested Recursion (30 marks)
+# Problem 1 (Solo) · 100 marks
 
 > Place your code and test files in this directory. Fill out the details below to document your submission. The problem statement appears on the live challenge page.
 

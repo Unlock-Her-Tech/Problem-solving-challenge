@@ -20,7 +20,7 @@ jobs:
           RUN_ATTEMPT: ${{ github.run_attempt }}
         shell: python
         run: |
-          import os, json, urllib.request, urllib.error, datetime
+          import os, json, re, urllib.request, urllib.error, datetime
           from pathlib import Path
           origin = 'https://unlockhertech-problemsolving.netlify.app'
           def api(path, data=None):
@@ -42,13 +42,30 @@ jobs:
               Path(os.environ['GITHUB_STEP_SUMMARY']).write_text('Timer connectivity OK. Event state: '+state['phase']+'. No event started or changed.')
               raise SystemExit(0)
           pr=event['pull_request']; sha=pr['head']['sha']; number=pr['number']
-          colors={'on-time':'238636','late':'d73a4a','before-start':'d4c5f9','paused':'d4a72c'}
+          match = re.match(r'^(Individual|Team):', pr['title'], re.I)
+          track = match.group(1).lower() if match else None
+          stages = ['welcome', 'individual', 'individual-submit', 'team', 'team-submit', 'wrap-up']
+          stage = state.get('stage')
+          if state.get('format') == 2 and state['phase'] == 'running':
+              if track is None or stage not in stages:
+                  status = 'timing-review'
+              elif stage == track+'-submit':
+                  status = 'on-time'
+              elif stages.index(stage) < stages.index(track+'-submit'):
+                  status = 'before-start'
+              else:
+                  status = 'late'
+          colors={'on-time':'238636','late':'d73a4a','before-start':'d4c5f9','paused':'d4a72c','timing-review':'fbca04'}
           try:
               api('/labels',{'name':status,'color':colors[status]})
           except urllib.error.HTTPError as error:
               if error.code != 422: raise
           api('/issues/'+str(number)+'/labels',{'labels':[status]})
-          deadline = 'not running' if state['deadline'] is None else datetime.datetime.fromtimestamp(state['deadline']/1000,datetime.timezone.utc).isoformat()
-          text = '**Submission timing: '+status+'**\n\nSession: `'+state.get('sessionId','legacy')+'`\n\nCommit: `'+sha+'`\n\nGitHub workflow received: '+run['created_at']+'\n\nEvent deadline (UTC): '+deadline+'\n\nAudit: '+run['html_url']+' (attempt '+os.environ['RUN_ATTEMPT']+'). Timing uses GitHub workflow creation time; delayed delivery or service failures require organiser review. Labels are cumulative. Grade the latest on-time SHA from the intended session, not a later PR head. Paused submissions require organiser review.'
+          window_end = state['deadline']
+          if state.get('format') == 2:
+              window_end = state['now'] + state['stageRemainingMs'] if stage in stages and state['phase'] == 'running' else None
+          deadline = 'not running'  if window_end is None else datetime.datetime.fromtimestamp(window_end/1000,datetime.timezone.utc).isoformat()
+          text = '**Submission timing: '+status+'**\n\nSession: `'+state.get('sessionId','legacy')+'`\n\nCommit: `'+sha+'`\n\nGitHub workflow received: '+run['created_at']+'\n\nStage or legacy session deadline (UTC): '+deadline+'\n\nAudit: '+run['html_url']+' (attempt '+os.environ['RUN_ATTEMPT']+'). Timing uses GitHub workflow creation time; delayed delivery or service failures require organiser review. Labels are cumulative. Grade the latest on-time SHA from the intended session, not a later PR head. Paused submissions require organiser review.'
+          text += '\n\nTrack: '+(track or 'unrecognised')+' · Stage: '+(stage or 'legacy')
           api('/issues/'+str(number)+'/comments',{'body':text})
           Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(text)
