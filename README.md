@@ -11,9 +11,14 @@ Have these ready when you join the call.
 - Git installed on your computer. Run `git --version` to check. [Install Git](https://git-scm.com/install/)
 - A code editor or IDE and the tools to run your chosen programming language. Any language is welcome.
 
-Fork this repository and clone your fork to your computer. If you already have a fork, sync it on GitHub and pull the changes into your local copy. Make sure you can run code locally and push to your fork before the call.
+### Fork and sync the repository
 
-[Fork and clone the repository](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo) · [Sync your fork](https://docs.github.com/en/pull-requests/how-tos/work-with-forks/syncing-a-fork) · [Set up GitHub authentication](https://docs.github.com/en/get-started/git-basics/set-up-git#authenticating-with-github-from-git)
+- **First time.** Select **Fork → Create fork** at the top of this repository. On your fork, select **Code → HTTPS** and copy the URL. Run `git clone YOUR_FORK_URL` using the URL you copied.
+- **Already have a fork.** On your fork, select **Sync fork → Update branch**. If you have a local copy, switch to `main` and run `git pull`. Otherwise, clone your fork using the steps above.
+
+Make sure you can run code locally and push to your fork before the call.
+
+[Pro Git guide to forks and pull requests](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project)
 
 ## Event schedule
 
@@ -41,7 +46,7 @@ If you need more time to submit your solo PR, tell an organiser before the team 
    | Team | [`solutions/team/`](solutions/team/) | `Team: Your Team Name` |
 
 3. When coding time ends, commit your changes and push your branch to your fork.
-4. Open a PR from that branch into this repository’s `main` branch and fill in the PR template. For the team round, choose one person to submit and list every team member. [Create a pull request from a fork](https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request-from-a-fork)
+4. On this repository, select **Pull requests → New pull request → compare across forks**. Choose this repository’s `main` as the base and your fork’s submission branch as the compare branch. Fill in the template and select **Create pull request**. For the team round, choose one person to submit and list every team member.
 
 Turn off AI coding tools for both rounds and submit your own work.
 
