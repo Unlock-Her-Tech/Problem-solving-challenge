@@ -1,0 +1,193 @@
+name: Score challenge submission
+
+'on':
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number
+        type: number
+        required: true
+      commit_sha:
+        description: Full commit SHA you judged (from the latest on-time submission comment)
+        type: string
+        required: true
+      solution:
+        description: Solution correctness and edge cases (0–60)
+        type: number
+        required: true
+      tidiness:
+        description: Readability, naming and organisation (0–15)
+        type: number
+        required: true
+      complexity:
+        description: Time and space complexity (0–20)
+        type: number
+        required: true
+
+permissions:
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: score-challenge-pr-${{ inputs.pr_number }}
+  cancel-in-progress: false
+
+jobs:
+  score:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The judge scores the recorded snapshot. This job never checks out or runs PR code.
+      - name: Calculate and publish the score
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: python
+        run: |
+          import json
+          import os
+          import re
+          from datetime import datetime
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+
+          WINDOW_MS = 5 * 60_000
+          TIMER = 'https://unlockhertech-problemsolving.netlify.app/api/state'
+          API = os.environ['GITHUB_API_URL'] + '/repos/' + os.environ['GITHUB_REPOSITORY']
+
+          def read_json(url, *, headers=None, method='GET', body=None):
+              data = None if body is None else json.dumps(body).encode()
+              request = Request(url, headers=headers or {}, method=method, data=data)
+              with urlopen(request, timeout=15) as response:
+                  return json.load(response)
+
+          def github(path, *, method='GET', body=None):
+              return read_json(API + path, method=method, body=body, headers={
+                  'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                  'Accept': 'application/vnd.github+json',
+                  'Content-Type': 'application/json',
+                  'User-Agent': 'UnlockHerTech-Challenge-Scoring',
+              })
+
+          def comments(number):
+              page = 1
+              while True:
+                  batch = github(f'/issues/{number}/comments?per_page=100&page={page}')
+                  yield from batch
+                  if len(batch) < 100:
+                      return
+                  page += 1
+
+          def workflow_bot(comment):
+              author = comment.get('user') or {}
+              return author.get('login') == 'github-actions[bot]' and author.get('type') == 'Bot'
+
+          def audit_record(comment):
+              if not workflow_bot(comment):
+                  return None
+              body = comment.get('body') or ''
+              if not body.startswith('**Submission timing: on-time**\n'):
+                  return None
+              session = re.search(r'^Session: `([\w-]+)`$', body, re.M)
+              commit = re.search(r'^Commit: `([a-f0-9]{40})`$', body, re.M)
+              received = re.search(r'^GitHub workflow received: (\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ)$', body, re.M)
+              track = re.search(r'^Track: (individual|team) · Stage: (individual-submit|team-submit)$', body, re.M)
+              if not (session and commit and received and track and track[2] == track[1] + '-submit'):
+                  return None
+              timestamp = int(datetime.fromisoformat(received[1]).timestamp()) * 1000
+              return timestamp, comment['id'], session[1], commit[1], track[1]
+
+          def submission(records, sha):
+              matching = [record for record in records if record[3] == sha]
+              if not matching:
+                  raise ValueError('This commit has no on-time submission comment. Check the SHA and timing audit.')
+              session = max(matching)[2]
+              in_session = [record for record in records if record[2] == session]
+              if max(in_session)[3] != sha:
+                  raise ValueError('A newer commit was submitted on time. Review and score that commit.')
+              return min(record for record in matching if record[2] == session)
+
+          def read_timer(at):
+              return read_json(f'{TIMER}?at={at}')
+
+          def elapsed_in_window(received, session, track):
+              state = read_timer(received)
+              if (state.get('sessionId'), state.get('stage'), state.get('phase')) != (session, track + '-submit', 'running'):
+                  raise ValueError('The timing audit does not match the event timer.')
+              if 'stageIndex' not in state:
+                  # Older sessions used a continuous clock with fixed windows.
+                  return WINDOW_MS - state['stageRemainingMs']
+
+              # Walk timer changes back to the opening of this window. Pauses and
+              # time spent at zero do not count. Added minutes never restore points.
+              elapsed = 0
+              interval_end = received
+              while True:
+                  changed_at = state['at']
+                  deadline = state.get('deadline')
+                  if deadline is not None:
+                      elapsed += max(0, min(interval_end, deadline) - changed_at)
+                  if state.get('action') == 'next':
+                      return elapsed
+                  if changed_at <= 0 or changed_at > interval_end:
+                      raise ValueError('The start of the submission window could not be verified.')
+                  interval_end = changed_at
+                  state = read_timer(changed_at - 1)
+                  if (state.get('sessionId'), state.get('stage')) != (session, track + '-submit'):
+                      raise ValueError('The start of the submission window could not be verified.')
+
+          def whole_number(inputs, field, minimum, maximum=None):
+              raw = str(inputs.get(field, ''))
+              if re.fullmatch(r'[0-9]+', raw):
+                  value = int(raw)
+                  if value >= minimum and (maximum is None or value <= maximum):
+                      return value
+              allowed = f'between {minimum} and {maximum}' if maximum is not None else f'at least {minimum}'
+              raise ValueError(f'{field} must be a whole number {allowed}.')
+
+          def main():
+              event = json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+              inputs = event['inputs']
+              number = whole_number(inputs, 'pr_number', 1)
+              sha = inputs['commit_sha'].strip().lower()
+              if not re.fullmatch(r'[a-f0-9]{40}', sha):
+                  raise ValueError('Enter the full 40-character commit SHA from the timing audit.')
+              solution = whole_number(inputs, 'solution', 0, 60)
+              tidiness = whole_number(inputs, 'tidiness', 0, 15)
+              complexity = whole_number(inputs, 'complexity', 0, 20)
+
+              pr = github(f'/pulls/{number}')
+              if pr['base']['ref'] != event['repository']['default_branch']:
+                  raise ValueError('This pull request must target the default branch.')
+              all_comments = list(comments(number))
+              audits = [record for comment in all_comments if (record := audit_record(comment))]
+              received, _, session, _, track = submission(audits, sha)
+              elapsed = elapsed_in_window(received, session, track)
+              timing = round(5 * max(0, 1 - elapsed / WINDOW_MS), 2)
+              total = solution + tidiness + complexity + timing
+              marker = f'<!-- unlock-her-tech-score:{session} -->'
+              title = 'Solo' if track == 'individual' else 'Team'
+              scorecard = f"""### {title} submission score — {total:.2f}/100
+
+          | Criterion | Score |
+          | --- | ---: |
+          | Solution correctness | {solution}/60 |
+          | Tidiness | {tidiness}/15 |
+          | Time and space complexity (Big O) | {complexity}/20 |
+          | Submission timing | {timing:.2f}/5 |
+
+          Graded commit `{sha}`. Submitted {elapsed / 1000:.1f} seconds into the submission window."""
+              body = {'body': f'{marker}\n{scorecard}'}
+              previous = next((comment for comment in all_comments if workflow_bot(comment)
+                               and (comment.get('body') or '').startswith(marker + '\n')), None)
+              if previous:
+                  github(f"/issues/comments/{previous['id']}", method='PATCH', body=body)
+              else:
+                  github(f'/issues/{number}/comments', method='POST', body=body)
+              Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(scorecard + '\n')
+
+          if __name__ == '__main__':
+              try:
+                  main()
+              except ValueError as error:
+                  raise SystemExit(str(error))
