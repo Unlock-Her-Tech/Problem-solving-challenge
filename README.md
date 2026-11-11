@@ -1,6 +1,5 @@
 # Unlock Her Tech Problem Solving Challenge
 
-[Live challenge and timer](https://unlockhertech-problemsolving.netlify.app)
 
 ## Before the call
 
