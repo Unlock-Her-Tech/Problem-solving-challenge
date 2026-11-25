@@ -4,20 +4,21 @@
 
 ### Language & Version
 <!-- e.g., Python 3.11, Node.js 20, Java 17, Go 1.21, C++20 -->
+ Node.js v22.21.0 (JavaScript)
 
 
 ### How to Run & Test
 <!-- Provide exact, runnable terminal commands including dependency installations if required -->
 ```sh
 # Run solution:
-
+Sliding window 
 # Run tests:
 
 ```
 
 ### Approach & Complexity
-- **Time Complexity:** `O(...)`
-- **Space Complexity:** `O(...)`
+- **Time Complexity:** `O(n)`
+- **Space Complexity:** `O(n)`
 - **Approach & Logic:**
   <!-- Briefly explain key data structures, algorithmic design, and trade-offs -->
 
